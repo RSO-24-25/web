@@ -1,20 +1,29 @@
 import streamlit as st
+from streamlit_cookies_manager import EncryptedCookieManager
+from helper_functions import is_user_logged_in, get_username
 
-# Set the page title and icon for the app
-st.set_page_config(page_title="My Multi-Page App", page_icon="🏠", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="OIMS", page_icon="🐍")#, initial_sidebar_state="collapsed")
 
-# Title for the home page
-st.title("Welcome to the Streamlit App!")
 
-# Check if user is logged in
-if "username" in st.session_state:
-    username = st.session_state["username"]
-    st.write(f"Welcome back, {username}!")
-    st.write("You are logged in. Go to the Orders page or add a new order.")
+
+st.title("Welcome to OIMS!")
+
+if is_user_logged_in():
+    
+    st.write(f"Welcome back, {get_username}!")
+    st.write("You can check your orders now!")
+    st.write("---") 
+    st.page_link(label="Check orders", page="pages/allorders.py") 
 else:
     st.write("You are not logged in.")
     st.write("Please log in or register to access the features.")
-    st.page_link(label="Login", page="pages/login.py") 
-    st.page_link(label="Register", page="pages/registration.py")
+    st.write("---")
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
 
-# Navigation links are automatically added to the sidebar if pages are placed in the `pages/` directory.
+    with col2:
+        if st.button("Login"):
+            st.switch_page("pages/login.py")
+
+    with col5:
+        if st.button("Register"):
+            st.switch_page("pages/registration.py")

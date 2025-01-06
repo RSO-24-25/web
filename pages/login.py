@@ -1,16 +1,10 @@
 import streamlit as st
+from helper_functions import user_log_in
 
-# Mock database (used for simplicity)
-users_db = {
-    "user1": {"password": "123", "orders": []},
-    "user2": {"password": "password456", "orders": []}
-}
+# st.set_page_config(page_title="Login to OIMS", page_icon="🐍")
 
-# Function to authenticate the user
-def authenticate_user(username, password):
-    if username in users_db and users_db[username]["password"] == password:
-        return True
-    return False
+
+
 
 # Login page
 def login_page():
@@ -18,12 +12,21 @@ def login_page():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     
-    if st.button("Log In"):
-        if authenticate_user(username, password):
-            st.session_state["username"] = username
-            st.success(f"Welcome back, {username}!")
-            st.switch_page("pages/allorders.py")
-        else:
-            st.error("Invalid username or password.")
+    col1, col2 = st.columns([8, 1])
+
+    with col1:
+        if st.button("Back"):
+            st.switch_page("app.py")
+
+    with col2:
+        if st.button("Log In"):
+            if username and password:
+                if user_log_in(username, password):
+                    st.success(f"Welcome back, {username}!")
+                    st.switch_page("pages/allorders.py")
+                else:
+                    st.error(f"Login failed")
+            else:
+                st.error("Please provide both username and password.")
 
 login_page()
