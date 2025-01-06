@@ -96,3 +96,27 @@ def get_weather():
         return data
     else:
         return f"Error: {response.status_code}"
+
+
+
+def get_top_headlines():
+    api_key = "c061ba6443df4b2997b094811d29c11e"
+    country = "us"
+    url = f"https://newsapi.org/v2/top-headlines?country={country}&apiKey={api_key}"
+    
+    # Make a GET request to the API
+    response = requests.get(url)
+    
+    # Check if the request was successful
+    if response.status_code == 200:
+        data = response.json()
+        
+        # Extract articles
+        articles = data.get("articles", [])
+        headlines = []
+        for article in articles:
+            headlines.append(article["title"])
+        
+        return headlines
+    else:
+        return f"Error: {response.status_code} - {response.reason}"

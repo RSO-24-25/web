@@ -3,23 +3,12 @@ st.set_page_config(page_title="OIMS", page_icon="🐍")#, initial_sidebar_state=
 from streamlit_cookies_manager import EncryptedCookieManager
 
 
-from helper_functions import is_user_logged_in, get_username, get_weather
+from helper_functions import is_user_logged_in, get_username, get_weather,get_top_headlines
 
 
 
 st.title("Welcome to OIMS!")
 
-try:
-    weather = get_weather()
-    temp_k = weather["main"]["temp"]  # Temperature in Kelvin
-    temp_c = round(temp_k - 273.15)
-    basic = weather["weather"][0]["main"]
-    description = f"Weather in Ljubljana: {basic}, {temp_c} °C"
-except:
-    description = "Weather info not availibe!"
-
-
-st.write(description)
 
 if is_user_logged_in():
     
