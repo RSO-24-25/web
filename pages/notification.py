@@ -39,7 +39,7 @@ def notification_page():
             st.error("All fields are required.")
         else:
             status = send_email_notification(recipient_email, subject, message)
-            if status == "success":
+            if status == "Email sent successfully!":
                 st.success("Notification sent successfully!")
             else:
                 st.error(f"Failed to send notification. {status}")
