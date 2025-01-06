@@ -76,3 +76,23 @@ def logout_user():
     cookies["access_token"] = ""  # Store token in cookie
     cookies["username"] = ""  # Store token in cookie
     cookies.save()
+
+
+
+
+def get_weather():
+
+    city = "Ljubljana"
+    api_key = "bfb8dccd0b442d975ff062d1f67e9ec8"
+
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
+    
+    # Send a request to the API
+    response = requests.get(url)
+    
+    # Check if the response is successful (status code 200)
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return f"Error: {response.status_code}"
