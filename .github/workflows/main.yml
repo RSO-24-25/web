@@ -21,4 +21,4 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t galmenase1/web-service:latest 
+          docker build -t galmenase1/web-service:latest .
