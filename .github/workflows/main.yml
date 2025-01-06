@@ -22,3 +22,15 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t galmenase1/web-service:latest .
+
+      # Log in to DockerHub
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ galmenase1 }}
+          password: ${{ boni4€sogreh }}
+
+      # Push Docker image to DockerHub
+      - name: Push Docker image
+        run: |
+          docker push galmenase1/web-service:latest
