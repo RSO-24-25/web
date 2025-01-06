@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package emailservice;
+
+// The email service definition.
+service EmailService {
+  // Sends an email notification
+  rpc SendEmail (EmailRequest) returns (EmailResponse);
+}
+
+// The request message containing only recipient details and email content.
+message EmailRequest {
+  string recipient_email = 1;
+  string subject = 2;
+  string message = 3;
+}
+
+// The response message.
+message EmailResponse {
+  string status = 1;
+}
