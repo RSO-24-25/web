@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_cookies_manager import EncryptedCookieManager
 from helper_functions import is_user_logged_in, get_username
 
-st.set_page_config(page_title="OIMS", page_icon="🐍")#, initial_sidebar_state="collapsed")
+# st.set_page_config(page_title="OIMS", page_icon="🐍")#, initial_sidebar_state="collapsed")
 
 
 
