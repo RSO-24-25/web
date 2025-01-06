@@ -3,6 +3,8 @@ import streamlit as st
 import os
 import sys
 
+st.set_page_config(page_title="OIMS", page_icon="🐍")
+
 # Import the gRPC email service files
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 import email_pb2

@@ -1,8 +1,8 @@
 import streamlit as st
+st.set_page_config(page_title="OIMS", page_icon="🐍")
 from helper_functions import is_user_logged_in
 
 
-# st.set_page_config(page_title="OIMS", page_icon="🐍")
 
 
 # Display details of a specific order

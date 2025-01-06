@@ -57,7 +57,12 @@ def user_log_in(username, password):
 
 
 def is_user_logged_in ():
-    if cookies["access_token"] and ["access_token"] != "":
+    try:
+        cookie = cookies["access_token"]
+    except:
+        cookie = ""
+
+    if cookie != "":
         return True
     else:
         return False

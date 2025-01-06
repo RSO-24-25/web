@@ -1,8 +1,8 @@
 import streamlit as st
 import time
-from helper_functions import register_user
-
 st.set_page_config(page_title="Register to OIMS", page_icon="🐍")
+
+from helper_functions import register_user
 
 
 

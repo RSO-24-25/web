@@ -1,8 +1,8 @@
 import streamlit as st
+
+st.set_page_config(page_title="OIMS", page_icon="🐍")
+
 from helper_functions import logout_user, get_username, is_user_logged_in
-
-# st.set_page_config(page_title="OIMS", page_icon="🐍")
-
 # Check if the user is logged in
 
 # Simulate a list of orders with details
