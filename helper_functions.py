@@ -2,8 +2,12 @@ import streamlit as st
 from streamlit_cookies_manager import EncryptedCookieManager
 import requests
 import time
+import os
 
-URL = "http://localhost:8000"
+# URL = "http://localhost:8000"
+# URL = "http://web-auth:8000"
+URL = os.getenv("AUTHENTICATION_URL")
+
 
 cookies = EncryptedCookieManager(
     prefix="oims_",
@@ -71,6 +75,9 @@ def is_user_logged_in ():
 def get_username():
     return cookies["username"]
 
+def get_token():
+    return cookies["access_token"]
+
 def logout_user():
     # Overwrite the cookies with an empty value and set them to expire in the past
     cookies["access_token"] = ""  # Store token in cookie
@@ -80,10 +87,28 @@ def logout_user():
 
 
 
+def get_token_owner_data():
+    url = URL + "/user-info"
+    headers = {"Authorization": f"Bearer {get_token()}"}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  
+
+        user_info = response.json()
+
+        print(user_info)
+        return user_info
+    except:
+        return None
+
+
+
 def get_weather():
 
     city = "Ljubljana"
-    api_key = "bfb8dccd0b442d975ff062d1f67e9ec8"
+    # api_key = "bfb8dccd0b442d975ff062d1f67e9ec8"
+    api_key = os.getenv("WEATHER_API_KEY")
 
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
     
@@ -100,7 +125,8 @@ def get_weather():
 
 
 def get_top_headlines():
-    api_key = "c061ba6443df4b2997b094811d29c11e"
+    # api_key = "c061ba6443df4b2997b094811d29c11e"
+    api_key = os.getenv("NEWS_API_KEY")
     country = "us"
     url = f"https://newsapi.org/v2/top-headlines?country={country}&apiKey={api_key}"
     

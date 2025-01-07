@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(page_title="OIMS", page_icon="🐍")
 
-from helper_functions import logout_user, get_username, is_user_logged_in
+from helper_functions import logout_user, get_username, is_user_logged_in, get_token_owner_data
 # Check if the user is logged in
 
 # Simulate a list of orders with details
@@ -43,5 +43,10 @@ def all_orders_page():
         if st.button("Logout"):
             logout_user()
             st.switch_page("app.py")
+
+
+
+        if st.button("check User"):
+            get_token_owner_data()
 
 all_orders_page()
