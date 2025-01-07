@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger on changes to the main branch
+      - main
 
 jobs:
   build:
@@ -21,4 +21,14 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t your-dockerhub-username/your-app:latest 
+          docker build -t rsocontainerregistry.azurecr.io/web-service:latest .
+
+      # Log in to Azure Container Registry using secrets
+      - name: Log in to Azure Container Registry
+        run: |
+          echo "wI0p9nGKlzHZaAGFWjvDIuM9PYpwsnqlnZl/vkG1KD+ACRDgR2Zm" | docker login rsocontainerregistry.azurecr.io --username "rsocontainerregistry" --password-stdin
+
+      # Push Docker image to Azure Container Registry
+      - name: Push Docker image to ACR
+        run: |
+          docker push rsocontainerregistry.azurecr.io/web-service:latest
