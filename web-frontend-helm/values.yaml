@@ -16,3 +16,7 @@ service:
   port: 8501
   targetPort: 8501
   type: ClusterIP
+
+health:
+  initialDelaySeconds: 20
+  periodSeconds: 120
