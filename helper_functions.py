@@ -6,9 +6,9 @@ import os
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-URL = "http://localhost:8000"
+# URL = "http://localhost:8000"
 # URL = "http://web-auth:8000"
-# URL = os.getenv("AUTHENTICATION_URL")
+URL = os.getenv("AUTHENTICATION_URL")
 
 
 cookies = EncryptedCookieManager(
