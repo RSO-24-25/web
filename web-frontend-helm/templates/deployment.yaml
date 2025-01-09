@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: {{ .Values.deployment.name }}
+      annotations: 
+        # This annotation will change on every Helm upgrade, forcing a new rollout
+        deployment.kubernetes.io/revision: "{{ .Release.Revision }}"
     spec:
       containers:
       - name: {{ .Values.deployment.name }}
