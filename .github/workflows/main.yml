@@ -64,6 +64,6 @@ jobs:
       # Deploy to Kubernetes using Helm chart
       - name: Deploy to Kubernetes
         run: |
-          helm upgrade --install web-frontend ./web-frontend-helm \
+          helm upgrade --install web-frontend ./web-frontend-helm --namespace ingress-nginx\
             #--set image.repository=rsocontainerregistry.azurecr.io/web-frontend \
             #--set image.tag=latest
