@@ -23,7 +23,7 @@ def login_page():
             if username and password:
                 if user_log_in(username, password):
                     st.success(f"Welcome back, {username}!")
-                    st.switch_page("pages/allorders.py")
+                    st.switch_page("pages/my_products.py")
                 else:
                     st.error(f"Login failed")
             else:

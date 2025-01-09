@@ -39,7 +39,7 @@ def registration_page():
                 if success:
                     st.success(f"User {data['username']} registered successfully!")
                     time.sleep(1)
-                    st.switch_page("pages/allorders.py")
+                    st.switch_page("pages/my_products.py")
                 else:
                     st.error(f"Registration failed: {error_message}")  # Display detailed error message
             else:

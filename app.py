@@ -15,7 +15,7 @@ if is_user_logged_in():
     st.write(f"Welcome back, {get_username}!")
     st.write("You can check your orders now!")
     st.write("---") 
-    st.page_link(label="Check orders", page="pages/allorders.py") 
+    st.page_link(label="Check orders", page="pages/my_products.py") 
 else:
     st.write("You are not logged in.")
     st.write("Please log in or register to access the features.")

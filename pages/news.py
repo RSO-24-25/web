@@ -1,6 +1,6 @@
 import streamlit as st
 st.set_page_config(page_title="News", page_icon="🐍")
-from helper_functions import get_weather, get_top_headlines
+from helper_functions import get_weather, get_top_headlines, add_product, get_all_users, create_user, delete_product
 
 
 
@@ -8,6 +8,18 @@ from helper_functions import get_weather, get_top_headlines
 
 # Login page
 def news_page():
+
+    response = delete_product("677eb0371dd91cc1a83abd24")
+    print(response)
+
+    # response = create_user("newuser@example.com")
+    # print(response)
+    # users = get_all_users()
+    # print(users)
+    # for user in users:
+    #     print(f"User ID: {user['_id']}, Email: {user['email']}")
+
+
     st.title("Weather and News")
     try:
         weather = get_weather()
