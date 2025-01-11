@@ -3,7 +3,7 @@ st.set_page_config(page_title="OIMS", page_icon="🐍")#, initial_sidebar_state=
 from streamlit_cookies_manager import EncryptedCookieManager
 
 
-from helper_functions import is_user_logged_in, get_username, get_weather,get_top_headlines
+from helper_functions import is_user_logged_in, get_username
 
 
 

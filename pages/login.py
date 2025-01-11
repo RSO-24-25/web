@@ -3,9 +3,6 @@ st.set_page_config(page_title="Login to OIMS", page_icon="🐍")
 from helper_functions import user_log_in
 
 
-
-
-
 # Login page
 def login_page():
     st.title("Login Page")

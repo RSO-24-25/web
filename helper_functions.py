@@ -6,9 +6,13 @@ import os
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-URL = "http://localhost:8000"
-# URL = "http://web-auth:8000"
-# URL = os.getenv("AUTHENTICATION_URL")
+AUTH_URL = "http://localhost:8000"
+# AUTH_URL = os.getenv("AUTHENTICATION_URL", "http://web-auth:8000")
+
+
+INV_URL = "http://localhost:3000"
+INV_URL_GQL = INV_URL + "/graphql"
+# INV_URL = os.getenv("INVENTORY_URL", "http://localhost:3000/graphql")
 
 
 cookies = EncryptedCookieManager(
@@ -17,14 +21,13 @@ cookies = EncryptedCookieManager(
 )
 
 
-
 if not cookies.ready():
     st.stop()
 
 
 def register_user(data):
     try:
-        response = requests.post(URL + "/register", json=data)
+        response = requests.post(AUTH_URL + "/register", json=data)
 
         if response.status_code == 200:
             time.sleep(1)
@@ -46,15 +49,20 @@ def user_log_in(username, password):
             "username": username,
             "password": password
         }
-    
-        response = requests.post(URL+"/token", data=payload, headers={"accept": "application/json"})
+        # print(payload)
+        response = requests.post(AUTH_URL+"/token", data=payload, headers={"accept": "application/json"})
+        # print(response)
         if response.status_code == 200:
+            print("login ok!")
             token_data = response.json()
             cookies["username"] = username
             cookies["access_token"] = token_data["access_token"]
+            cookies["refresh_token"] = token_data["refresh_token"]
             cookies["email"] = get_token_owner_data()["email"]
+            print("saving_cookies")
             cookies.save()
-            print(cookies)
+            print("cookies saved!")
+            # print(cookies)
             return True
         else:
             return False
@@ -70,11 +78,13 @@ def is_user_logged_in ():
         cookie = cookies["access_token"]
     except:
         cookie = ""
-
+    # print("USER ACCES TOKEN")
+    # print(cookies["access_token"])
     if cookie != "":
         return True
     else:
         return False
+    
 
 def get_email():
     return cookies["email"]
@@ -86,18 +96,32 @@ def get_token():
     return cookies["access_token"]
 
 def logout_user():
-    # Overwrite the cookies with an empty value and set them to expire in the past
+    refresh_token = cookies["refresh_token"]
     cookies["access_token"] = ""  # Store token in cookie
+    cookies["refresh_token"] = "" 
     cookies["username"] = ""  # Store token in cookie
     cookies["email"] = ""
-    cookies.save()
+    # cookies.save()
     forget_current_product()
+
+    payload = {
+            "refresh_token": refresh_token,
+        }
+    try:
+        requests.post(AUTH_URL+"/logout", data=payload, headers={"accept": "application/json"})
+    except Exception as e:
+        print(e)
+
+
+
+    # Overwrite the cookies with an empty value and set them to expire in the past
+    
 
 
 
 
 def get_token_owner_data():
-    url = URL + "/user-info"
+    url = AUTH_URL + "/user-info"
     headers = {"Authorization": f"Bearer {get_token()}"}
 
     try:
@@ -157,135 +181,176 @@ def get_top_headlines():
         return f"Error: {response.status_code} - {response.reason}"
     
 
-MONGO_URI="mongodb+srv://mongodb:galjetaksef123!@mongoloidgal.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000"
-client = MongoClient(MONGO_URI)
-db = client.inventory_db  # Replace with your database name
-users_collection = db.users  # Replace with your users collection name
-products_collection = db.products  # Replace with your products collection name
+# MONGO_URI="mongodb+srv://mongodb:galjetaksef123!@mongoloidgal.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000"
+# client = MongoClient(MONGO_URI)
+# db = client.inventory_db  # Replace with your database name
+# users_collection = db.users  # Replace with your users collection name
+# products_collection = db.products  # Replace with your products collection name
 
 def add_product(name, description, quantity, owner_email):
-    """Adds a new product to the MongoDB database."""
-    
-    # Check if the owner email exists in the users collection
-    if not users_collection.find_one({"email": owner_email}):
-        return {"error": "Owner email does not exist."}
-    
-    # Prepare the product data to be inserted
-    product = {
-        "name": name,
-        "description": description,
-        "quantity": quantity,
-        "owner_email": owner_email
+    mutation = f"""
+    mutation {{
+        createProduct(name: "{name}", description: "{description}", quantity: {quantity}, ownerEmail: "{owner_email}") {{
+            product {{
+                id
+                name
+                description
+                quantity
+                ownerEmail
+            }}
+        }}
+    }}
+    """
+
+    # Set headers (include authentication if needed)
+    headers = {
+        "Content-Type": "application/json",
+        # Add your token if required
+        # "Authorization": f"Bearer {your_token}"
+    }
+
+    # Send the request
+    response = requests.post(INV_URL_GQL, json={"query": mutation}, headers=headers)
+    data = response.json()
+    print(data)
+    # if 'errors' in data:
+    #     print(f"Error: {data['errors']}")
+
+
+
+
+def get_user_products(token):
+    # GraphQL query with variables
+    # token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJLdjRVRzdSRUx6c3p0aFQwU1A3cGlGVXY1TlZNTnF2NWdqSDVHcFNYajRVIn0.eyJleHAiOjE3MzY1NDU3NjIsImlhdCI6MTczNjU0MjE2MiwianRpIjoiMjFkMTIwZTEtNGEwMy00NmJjLTkzMjEtMjE5MTVkZGU2YzFkIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvcmVhbG1zL215cmVhbG0iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiMDJhODRhYzAtMGZiZS00OTk5LTlhZTYtYmVmOGJmZTczYzkyIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoibXljbGllbnQiLCJzaWQiOiIyZTg2ZWVkYS01NTk2LTRjYTktODk1ZC1mNGJjMDI1ODA0ZGEiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtbXlyZWFsbSIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJ1c2VyIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsibXljbGllbnQiOnsicm9sZXMiOlsic2VmZ2FsIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiR2FsIE1lbmHFoWUiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJnYWxrbzEyMyIsImdpdmVuX25hbWUiOiJHYWwiLCJmYW1pbHlfbmFtZSI6Ik1lbmHFoWUiLCJlbWFpbCI6ImdhbGtvLm1lbmFzZUBnbWFpbC5jb20ifQ.or_PNtnUlU8Wxbexy8ATlX6MJO8eKYe9DZ7qFBXZ_avzWno-u6P-TEj1yTt3sRdduFGCpSizVh9gb7FH9gwUNh1YE5I39ltmoKwJPWJ5cafPXNBj-byacb7ZeUxTmdQPZBggeoxBLTryN6drb71miAS7pMCaOrfCdyWcZ7Qwd6MTcMAg0OrlhS-1TJf1KYb585ocwh-_bOdYabaIWPjaFU2dv5hR9imOMIAW1o_OGwYAVSfZWTpP-YUZEOKah1A68wYpEswaCYup7vAZmTv9isD-rQfXKnCpcg_KKBEI4qZuOUGzoIvBiWp65_apOVsSTeQo-zkB1ynL54oLXiXOhg"
+    query = f"""
+    query {{
+        productsByToken(token: "{token}") {{
+            id
+            name
+            description
+            quantity
+            ownerEmail
+        }}
+    }}
+    """   
+    headers = {
+        "Content-Type": "application/json"
     }
     
-    # Insert the product into the products collection
-    result = products_collection.insert_one(product)
-    
-    # Return the inserted product ID
-    return {"message": "Product added successfully", "product_id": str(result.inserted_id)}
-
-def get_all_products():
-    """Fetches all products from the MongoDB database."""
-    # Fetch all products from the 'products' collection
-    products = list(products_collection.find())  # Using find() to get all products
-    # Serialize ObjectId to string for display purposes
-    print(products)
-    for product in products:
-        product["_id"] = str(product["_id"])
-    return products
-
-def get_all_users():
-    """Fetches all users from the MongoDB users collection."""
-    # Fetch all users from the 'users' collection
-    users = list(users_collection.find())  # Using find() to get all users
-    # Serialize ObjectId to string for display purposes
-    for user in users:
-        user["_id"] = str(user["_id"])  # Convert ObjectId to string for easier usage
-    return users
+    # Make the request
+    response = requests.post(INV_URL_GQL, json={"query": query}, headers=headers)
+    # response = requests.post(INV_URL_GQL, json={"query": query, "variables": variables})
+    data = response.json()
+    print(data)
+    products = data.get('productsByToken', [])
+    # print(products)
+    return  products
 
 
-def create_user(email):
-    """Creates a new user in the MongoDB users collection."""
-    
-    # Check if the email already exists in the database
-    if users_collection.find_one({"email": email}):
-        return {"error": "Email already exists."}
-    
-    # Prepare the new user document
-    user = {
-        "email": email,
-    }
-    
-    # Insert the new user into the users collection
-    result = users_collection.insert_one(user)
-    
-    # Return success message and the new user's ID
-    return {"message": "User created successfully", "user_id": str(result.inserted_id)}
+def is_user_in_the_database(email):
+    query = f"""
+    {{
+    userByEmail(email: "{email}") {{
+        id
+        email
+    }}
+    }}
+    """
+    response = requests.post(INV_URL_GQL, json={'query': query})
+    data = response.json()
+    if (data['userByEmail']):
+        print("Mail exists!")
+    else: 
+        print("Mail does not exist, adding it to the base!")
 
-def check_mail():
-    user_email = get_email()
-    users = get_all_users()
+        mutation = f"""
+        mutation {{
+        createUser(email: "{email}") {{
+            user {{
+            id
+            email
+            }}
+        }}
+        }}
+        """
+        response = requests.post(INV_URL_GQL, json={'query': mutation})
+        if response.status_code == 200:
+            print("Mail succesfully added")
+        else:
+            print(f"Error {response.status_code}: {response.text}")
 
-    mail_exists = False
-    for user in users:
-        if user["email"] == user_email:
-            mail_exists = True
-            print("Mail exists!")
-
-    if not mail_exists:
-        print(f"Mail does not exist! New mail created: {user_email}")
-        print(create_user(user_email))
-    
+       
 
 
 def delete_product(product_id):
 
-    try:
-        # Convert the product_id to an ObjectId
-        object_id = ObjectId(product_id)
-    except Exception as e:
-        return {"error": f"Invalid product ID: {str(e)}"}
-    
-    # Check if the product exists
-    product = products_collection.find_one({"_id": object_id})
-    if not product:
-        return {"error": "Product not found."}
-    
-    # Delete the product
-    result = products_collection.delete_one({"_id": object_id})
-    if result.deleted_count == 1:
-        return {"message": "Product deleted successfully."}
-    else:
-        return {"error": "Failed to delete product."}
+    mutation = f"""
+    mutation {{
+        deleteProduct(id: "{product_id}") {{
+            success
+        }}
+    }}
+    """
+
+    # Set headers (include authentication if needed)
+    headers = {
+        "Content-Type": "application/json",
+        # Add your token if required
+        # "Authorization": f"Bearer {your_token}"
+    }
+
+    # Send the request
+    response = requests.post(INV_URL_GQL, json={"query": mutation}, headers=headers)
+
+    # Parse the response
+    data = response.json()
+    print(data)
     
 
 
 
-def update_product_quantity(product_id, quantity_change):
-    try:
-        object_id = ObjectId(product_id)
-    except Exception as e:
-        return {"error": f"Invalid product ID: {str(e)}"}
-    
-    # Find the product by its ID
-    product = products_collection.find_one({"_id": object_id})
-    if not product:
-        return {"error": "Product not found."}
-    
-    # Calculate the new quantity
-    new_quantity = product.get("quantity", 0) + quantity_change
-    if new_quantity < 0:
-        return {"error": "Quantity cannot be negative."}
-    
-    # Update the quantity in the database
-    result = products_collection.update_one(
-        {"_id": object_id},
-        {"$set": {"quantity": new_quantity}}
-    )
-    if result.modified_count == 1:
-        return {"message": "Product quantity updated successfully.", "new_quantity": new_quantity}
-    else:
-        return {"error": "Failed to update product quantity."}
+def update_product_quantity(product_id, new_quantity):
+    mutation = f"""
+    mutation {{
+        updateProductQuantity(id: "{product_id}", quantity: {new_quantity}) {{
+            product {{
+                id
+                name
+                description
+                quantity
+                ownerEmail
+            }}
+        }}
+    }}
+    """
+    print(f"new {new_quantity}")
+    variables = {
+        "id": str(product_id),
+        "quantity": float(new_quantity)
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        # Add authentication headers if required
+    }
+
+    response = requests.post(INV_URL_GQL, json={"query": mutation, "variables": variables}, headers=headers)
+
+
+    # Parse the response
+    data = response.json()
+    print(data)
+
+    # # Check if there are any errors
+    # if 'errors' in data:
+    #     print(f"Error: {data['errors']}")
+    # else:
+    #     # Get the response data
+    #     updated_product = data.get('data', {}).get('updateProductQuantity', None)
+    #     if updated_product:
+    #         print(f"Product quantity updated: {updated_product['name']} (ID: {updated_product['id']}, Quantity: {updated_product['quantity']})")
+    #     else:
+    #         print(f"Product with ID {product_id} not found or could not be updated.")
 
 
 
@@ -303,17 +368,55 @@ def forget_current_product():
 
 def get_product_by_id(product_id):
 
-    try:
-        # Convert the product_id to an ObjectId
-        object_id = ObjectId(product_id)
-    except Exception as e:
-        return {"error": f"Invalid product ID: {str(e)}"}
+    query = """
+    {
+      productById(id: "%s") {
+        id
+        description
+        name
+        quantity
+        ownerEmail
+      }
+    }
+    """ % product_id  # Insert the product_id dynamically
+
+    # Prepare the payload
+    payload = {
+        'query': query
+    }
+
+    # Send the POST request to the GraphQL server
+    response = requests.post(INV_URL_GQL, json=payload)
+    # print(response)
+    # Parse the response
+    if response.status_code == 200:
+        data = response.json()
+        print(data)
+        # Return the product data if available
+        if 'productById' in data:
+            return data['productById']
+        else:
+            return {"error": "Product not found or invalid ID"}
+    else:
+        return {"error": f"Error {response.status_code}: {response.text}"}
+
+
+
+
+# def send_token(token):
+#     payload = {
+#         "token": token
+#     }
     
-    # Fetch the product from the database
-    product = products_collection.find_one({"_id": object_id})
-    if not product:
-        return {"error": "Product not found."}
-    
-    # Serialize the ObjectId to a string for JSON compatibility
-    product["_id"] = str(product["_id"])
-    return product
+#     response = requests.post(INV_URL + "/post-token", json=payload)
+#     print(response)
+#     # Check the response
+#     if response.status_code == 200:
+#         print("Success")
+#         # print("Token received successfully:", response.json())
+#         return response
+#     else:
+#         # print("Error:", response.json())
+#         print("Error")
+#         return None
+

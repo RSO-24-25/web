@@ -1,6 +1,6 @@
 import streamlit as st
 st.set_page_config(page_title="News", page_icon="🐍")
-from helper_functions import get_weather, get_top_headlines, add_product, get_all_users, create_user, delete_product
+from helper_functions import get_weather, get_top_headlines
 
 
 
@@ -10,6 +10,7 @@ from helper_functions import get_weather, get_top_headlines, add_product, get_al
 def news_page():
 
     st.title("Weather and News")
+    
     try:
         weather = get_weather()
         temp_k = weather["main"]["temp"]  # Temperature in Kelvin

@@ -19,38 +19,34 @@ def check_product_page():
         st.stop()
     else:
 
-
-        # Check if an order is selected
-       
-
         # Retrieve the selected order details from session_state
         product = get_product_by_id(get_current_product())
-
+        print(product)
         if product == "":
             st.error("No order selected. Please go back to the All Orders page.")
             st.stop()
 
         # Display the order details
         st.write(f"**Product Name**: {product['name']}")
-        st.write(f"**Product ID**: {product['_id']}")
+        st.write(f"**Product ID**: {product['id']}")
         st.write(f"**Product Description**: {product['description']}")
         st.write(f"**Product Quantity**: {product['quantity']}")
-
+        st.write(f"**Product Owner**: {product['ownerEmail']}")
 
         buy_quantity = st.number_input("Buy quantity", placeholder="Enter how much you want to buy")
         if st.button("Buy product"):
-            print(update_product_quantity(product['_id'], buy_quantity))
+            print(update_product_quantity(product['id'], product['quantity'] + buy_quantity))
             st.switch_page("pages/check_product.py")
 
         sell_quantity = st.number_input("Sell quantity", placeholder="Enter how much you want to sell")
         if st.button("Sell product"):
-            print(update_product_quantity(product['_id'], -sell_quantity))
+            print(update_product_quantity(product['id'], product['quantity']-sell_quantity))
             st.switch_page("pages/check_product.py")
 
 
         # Add a button to go back to the All Orders page
         if st.button("Delete this product"):
-            delete_product(product['_id'])
+            delete_product(product['id'])
             st.switch_page("pages/my_products.py")
 
         if st.button("Back to my products"):
