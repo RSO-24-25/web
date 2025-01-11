@@ -6,13 +6,10 @@ import os
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-AUTH_URL = "http://localhost:8000"
-# AUTH_URL = os.getenv("AUTHENTICATION_URL", "http://web-auth:8000")
-
-
-INV_URL = "http://localhost:3000"
-INV_URL_GQL = INV_URL + "/graphql"
-# INV_URL = os.getenv("INVENTORY_URL", "http://localhost:3000/graphql")
+# URL = "http://localhost:8000"
+# URL = "http://web-auth:8000"
+AUTH_URL = os.getenv("AUTHENTICATION_URL")
+INV_URL_GQL = os.getenv("INVENTORY_URL")
 
 
 cookies = EncryptedCookieManager(

@@ -13,7 +13,7 @@ import email_pb2_grpc
 def send_email_notification(recipient_email, subject, message):
     try:
         # Connect to the gRPC server
-        channel = grpc.insecure_channel('localhost:50051')
+        channel = grpc.insecure_channel('notification:50051')
         stub = email_pb2_grpc.EmailServiceStub(channel)
 
         # Send the email

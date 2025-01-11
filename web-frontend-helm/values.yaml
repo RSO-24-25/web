@@ -10,9 +10,15 @@ deployment:
       value: "c061ba6443df4b2997b094811d29c11e"
     - name: AUTHENTICATION_URL
       value: "http://web-auth:8000/web-auth"
+    - name: INVENTORY_URL
+      value: "http://inventory:3000/graphql"
 
 service:
   name: web-frontend
   port: 8501
   targetPort: 8501
   type: ClusterIP
+
+health:
+  initialDelaySeconds: 20
+  periodSeconds: 120
