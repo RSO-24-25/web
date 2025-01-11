@@ -32,7 +32,7 @@ def my_products_page():
         # if response:
         #     response_data = response.json()
         #     products = response_data['products']
-        if product is not None:
+        if products is not None:
             i = 0
             for product in products:
                 i += 1
