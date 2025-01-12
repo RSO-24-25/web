@@ -60,13 +60,13 @@ def check_product_page():
         buy_quantity = st.number_input("Buy quantity", placeholder="Enter how much you want to buy")
         if st.button("Buy product"):
             print(update_product_quantity(product['id'], product['quantity'] + buy_quantity))
-            # send_email_notification(get_email(), "Izdelki uspešno kupljeni!" f"Pozdravljeni {get_first_name()}\n\n uspešno ste kupili izdelek {product['name']} (količina: {buy_quantity}).\n\nLep pozdrav,\n\nEkipa OIMS")
+            send_email_notification(get_email(), "Izdelki uspešno kupljeni!" f"Pozdravljeni {get_first_name()}\n\n uspešno ste kupili izdelek {product['name']} (količina: {buy_quantity}).\n\nLep pozdrav,\n\nEkipa OIMS")
             st.switch_page("pages/check_product.py")
 
         sell_quantity = st.number_input("Sell quantity", placeholder="Enter how much you want to sell")
         if st.button("Sell product"):
             print(update_product_quantity(product['id'], product['quantity']-sell_quantity))
-            # send_email_notification(get_email(), "Izdelki uspešno kupljeni!" f"Pozdravljeni {get_first_name()}\n\n uspešno ste prodali izdelek {product['name']} (količina: {sell_quantity}).\n\nLep pozdrav,\n\nEkipa OIMS")
+            send_email_notification(get_email(), "Izdelki uspešno kupljeni!" f"Pozdravljeni {get_first_name()}\n\n uspešno ste prodali izdelek {product['name']} (količina: {sell_quantity}).\n\nLep pozdrav,\n\nEkipa OIMS")
             st.switch_page("pages/check_product.py")
 
 
