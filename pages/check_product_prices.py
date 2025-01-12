@@ -7,7 +7,6 @@ from statistics_helper import get_prices_graph, get_stat_prod
 # Display details of a specific order
 def check_product_prices_page():
     st.title("Product Prices Graph")
-    st.write("Bitcon prices")
     
     id = int(get_stat_prod())
 
