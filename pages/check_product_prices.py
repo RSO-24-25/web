@@ -13,7 +13,7 @@ def check_product_prices_page():
 
     graph = get_prices_graph(id)
 
-    st.image(graph, caption="Prices graph", use_column_width=True)
+    st.image(graph, caption="Prices graph")
 
     # st.write(f"**Product Name**: {product['name']}")
 
