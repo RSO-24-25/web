@@ -55,7 +55,9 @@ def user_log_in(username, password):
             cookies["username"] = username
             cookies["access_token"] = token_data["access_token"]
             cookies["refresh_token"] = token_data["refresh_token"]
-            cookies["email"] = get_token_owner_data()["email"]
+            user = get_token_owner_data()
+            cookies["first_name"] = user['first_name']
+            cookies["email"] = user["email"]
             print("saving_cookies")
             cookies.save()
             print("cookies saved!")
@@ -81,7 +83,9 @@ def is_user_logged_in ():
         return True
     else:
         return False
-    
+
+def get_first_name():
+    return cookies["first_name"]
 
 def get_email():
     return cookies["email"]
@@ -98,6 +102,7 @@ def logout_user():
     cookies["refresh_token"] = "" 
     cookies["username"] = ""  # Store token in cookie
     cookies["email"] = ""
+    cookies["first_name"] = ""
     # cookies.save()
     forget_current_product()
 

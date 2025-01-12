@@ -1,8 +1,31 @@
+import grpc
 import streamlit as st
+import os
+import sys
+
 st.set_page_config(page_title="OIMS", page_icon="🐍")
-from helper_functions import is_user_logged_in, delete_product, update_product_quantity, get_current_product, get_product_by_id
+from helper_functions import is_user_logged_in, delete_product, update_product_quantity, get_current_product, get_product_by_id, get_email, get_first_name
 
+# Import the gRPC email service files
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+import email_pb2
+import email_pb2_grpc
 
+def send_email_notification(recipient_email, subject, message):
+    try:
+        # Connect to the gRPC server
+        channel = grpc.insecure_channel('notification:50051')
+        stub = email_pb2_grpc.EmailServiceStub(channel)
+
+        # Send the email
+        response = stub.SendEmail(email_pb2.EmailRequest(
+            recipient_email=recipient_email,
+            subject=subject,
+            message=message
+        ))
+        return response.status
+    except Exception as e:
+        return f"Error: {e}"
 
 
 # Display details of a specific order
@@ -37,11 +60,13 @@ def check_product_page():
         buy_quantity = st.number_input("Buy quantity", placeholder="Enter how much you want to buy")
         if st.button("Buy product"):
             print(update_product_quantity(product['id'], product['quantity'] + buy_quantity))
+            send_email_notification(get_email(), "Izdelki uspešno kupljeni!" f"Pozdravljeni {get_first_name()}\n\n uspešno ste kupili izdelek {product['name']} (količina: {buy_quantity}).\n\nLep pozdrav,\n\nEkipa OIMS")
             st.switch_page("pages/check_product.py")
 
         sell_quantity = st.number_input("Sell quantity", placeholder="Enter how much you want to sell")
         if st.button("Sell product"):
             print(update_product_quantity(product['id'], product['quantity']-sell_quantity))
+            send_email_notification(get_email(), "Izdelki uspešno kupljeni!" f"Pozdravljeni {get_first_name()}\n\n uspešno ste prodali izdelek {product['name']} (količina: {sell_quantity}).\n\nLep pozdrav,\n\nEkipa OIMS")
             st.switch_page("pages/check_product.py")
 
 
