@@ -2,3 +2,6 @@ streamlit
 streamlit_cookies_manager
 grpcio
 pymongo
+pandas
+protobuf
+pillow
