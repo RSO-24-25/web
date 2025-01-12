@@ -12,6 +12,9 @@ deployment:
       value: "http://web-auth:8000/web-auth"
     - name: INVENTORY_URL
       value: "http://inventory:3000/inventory/graphql"
+    - name: INVOICE_SERVICE_URL
+      value: "http://invoice-service:8877"
+
 
 service:
   name: web-frontend
