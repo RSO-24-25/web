@@ -6,14 +6,14 @@ from statistics_helper import get_prices_graph, get_stat_prod
 
 # Display details of a specific order
 def check_product_prices_page():
-    st.title("Order Details")
-
+    st.title("Product Prices Graph")
+    st.write("Bitcon prices")
     
     id = int(get_stat_prod())
 
     graph = get_prices_graph(id)
 
-    st.image(graph, caption="Your Caption Here", use_column_width=True)
+    st.image(graph, caption="Prices graph", use_column_width=True)
 
     # st.write(f"**Product Name**: {product['name']}")
 
