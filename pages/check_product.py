@@ -20,8 +20,8 @@ def check_product_page():
     else:
 
         # Retrieve the selected order details from session_state
-        # product = get_product_by_id(get_current_product())
-        product = get_product_by_id("677ec87bc706e6174ce25a60")
+        product = get_product_by_id(get_current_product())
+        # product = get_product_by_id("677ec87bc706e6174ce25a60")
         print(product)
         if product == "":
             st.error("No order selected. Please go back to the All Orders page.")
