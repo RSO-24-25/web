@@ -1,4 +1,6 @@
-# Web service je front end naše aplikacije
+# WEB-SERVICE 
+
+Web service je front end naše aplikacije
 
 Zgrajen je z uporabo **Streamlit**. Omogoča uporabnikom upravljanje njihovih naročil/produktov, ustvarjanje novih produktov, posodabljanje količin ter prejemanje e-poštnih obvestil o nakupih in prodajah. Aplikacija vključuje sistem za registracijo in prijavo uporabnikov ter omogoča vizualizacijo gibanja cen produktov skozi čas.
 
