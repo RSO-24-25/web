@@ -37,9 +37,9 @@ def generate_invoice(sender_name: str, receiver_name: str, amount: float) -> str
             # Write the PDF to a local file
 
             
-            # with open(pdf_filename, "wb") as pdf_file:
-            #     for chunk in response.iter_content(chunk_size=8192):
-            #         pdf_file.write(chunk)
+            with open(pdf_filename, "wb") as pdf_file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    pdf_file.write(chunk)
 
             print(f"Invoice successfully generated and saved to {pdf_filename}")
             return pdf_filename
