@@ -56,7 +56,7 @@ def user_log_in(username, password):
             cookies["access_token"] = token_data["access_token"]
             cookies["refresh_token"] = token_data["refresh_token"]
             # user = get_token_owner_data()
-            cookies["first_name"] = get_token_owner_data()['first_name']
+            cookies["first_name"] = get_token_owner_data()['given_name']
             cookies["email"] = get_token_owner_data()["email"]
             print("saving_cookies")
             cookies.save()
